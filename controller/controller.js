@@ -26,7 +26,7 @@ export const insertPosts = async (req, res) => {
       postImage: req.body.postImage,
       profileImage: req.body.profilImage,
       title: req.body.title,
-      url :req.boyd.url,
+      url :req.body.url,
       description: req.body.description
     });
 
