@@ -24,7 +24,7 @@ export const insertPosts = async (req, res) => {
     const post = new Post({
       companyName: req.body.companyName,
       postImage: req.body.postImage,
-      profileImage: req.body. profileImage,
+      profileImage: req.body.profileImage,
       title: req.body.title,
       url :req.body.url,
       description: req.body.description
