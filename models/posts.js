@@ -4,7 +4,7 @@ const {Schema} = mongoose;
 const posts = new Schema({
  profileImage:{
     type: String,
-    required:true
+    // required:true
  },
  postImage:{
     type:String,
