@@ -1,31 +1,23 @@
-import  mongoose from 'mongoose';
-const {Schema} = mongoose;
+import { Timestamp } from "mongodb";
+import mongoose from "mongoose";
+const { Schema } = mongoose;
 
-const posts = new Schema({
- profileImage:{
-    type: String,
-    // required:true
- },
- postImage:{
-    type:String,
-    required:true
- },
- title:{
-    type:String,
-    required:true
- },
- description:{
-    type:String,
-    required: true
- },
- companyName:{
-   type:String,
-   required: true
- },
- url:{
-   type:String,
-   required: true 
- }
-}
-)
+const posts = new Schema(
+    {
+        title: {
+            type: String,
+            required: true,
+        },
+        description: {
+            type: String,
+            required: true,
+        },
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "user",
+            required: true,
+        }
+    },
+    { timestamps: true }
+);
 export default posts;

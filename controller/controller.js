@@ -1,61 +1,143 @@
-import mongoose from 'mongoose';
-import PostModel from '../models/posts.js';
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import dotenv from "dotenv";
+dotenv.config();
+import PostModel from "../models/posts.js";
+import UserModel from "../models/user.js";
+import jwt from "jsonwebtoken";
+const User = mongoose.model("User", UserModel);
+const Post = mongoose.model("Post", PostModel);
 
-const Post = mongoose.model('Post', PostModel);
-
-//  GET requests for all posts
-export const getPosts = async (req, res) => {
-  try {
-    // Get all posts from the database
-    const posts = await Post.find();
-
-    //  success response 
-    res.status(200).json(posts);
-  } catch (error) {
-    // If there was an error, send a 500 error response with the error message
-    res.status(500).json({ message: error.message });
-  }
-}
-
-//  requests to create a new post
-export const insertPosts = async (req, res) => {
-  try {
-    // Create a new post with the data from the request body
-    const post = new Post({
-      companyName: req.body.companyName,
-      postImage: req.body.postImage,
-      profileImage: req.body.profileImage,
-      title: req.body.title,
-      url :req.body.url,
-      description: req.body.description
-    });
-
-    // Save the post to the database
-    await post.save();
-
-    // Send a success response with the created post object
-    res.status(201).json(post);
-  } catch (error) {
-    // If there was an error, send a 500 error response with the error message
-    res.status(500).json({ message: error.message });
-  }
-}
-
-//delete request
-export const deletePostById = async (req, res) => {
+// GET request to get all users
+export const getUsers = async (req, res) => {
     try {
-      // find the post by ID and delete it from the database
-      const deletedPost = await Post.findByIdAndDelete(req.params.id);
-  
-      // If the post was not found, send a 404 error response
-      if (!deletedPost) {
-        return res.status(404).json({ message: 'Post not found' });
-      }
-  
-      // Send a success response with the deleted post object
-      res.status(200).json(deletedPost);
+        const users = await User.find();
+
+        res.status(200).json({
+            success: "true",
+            result: users,
+        });
     } catch (error) {
-      // If there was an error, send a 500 error response with the error message
-      res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
-  }
+};
+
+// POST request to create a new user
+export const createUser = async (req, res) => {
+    const password = await bcrypt.hash(req.body.password, 10);
+    console.log(password);
+    try {
+        const user = new User({
+            username: req.body.username,
+            email: req.body.email,
+            password: password,
+        });
+        await user.save();
+        
+        // creating the payload
+
+        const payload = { id: user._id };
+        const accessKey = process.env.ACCESS_SECRET_KEY;
+        const accessLife = process.env.ACCESS_TOKEN_LIFE;
+
+        const accessToken = jwt.sign(payload, accessKey);
+
+        // res.cookie("jwt", accessToken, { httpOnly: true });
+        res.status(201).send({
+            success: true,
+            token: accessToken,
+        });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+        console.log(error);
+    }
+};
+
+// GET request to get a single user by ID
+export const getUserById = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// PUT request to update a user by ID
+export const updateUserById = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        user.username = req.body.username || user.username;
+        user.email = req.body.email || user.email;
+        user.password = req.body.password || user.password;
+
+        await user.save();
+
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// DELETE request to delete a user by ID
+export const deleteUserById = async (req, res) => {
+    try {
+        const deletedUser = await User.findByIdAndDelete(req.params.id);
+
+        if (!deletedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json(deletedUser);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+
+
+// user log in controller
+
+export const logIn = async(req, res) => {
+    const {email, password} = req.body;
+
+    try {
+        const existingUser = await User.findOne({email});
+        if(!existingUser){
+            return res.status(404).send({
+                message: "Invalid details. Plz try again!"
+            })
+        }
+        const matchPassword = await bcrypt.compare(password, existingUser.password)
+        if(!matchPassword){
+            return res.status(403).send({
+                message: "Invalid details"
+            })
+        }
+        const token = jwt.sign({
+            id: existingUser._id
+        }, process.env.ACCESS_SECRET_KEY);
+
+        res.status(201).json({
+            message: "success",
+            token: token,
+            user: existingUser
+        })
+    } catch (err) {
+        res.status(500).json({
+            message: "failed",
+            error: err.message
+        })
+    }
+}

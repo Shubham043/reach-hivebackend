@@ -1,9 +1,12 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import routes from './routes/routes.js'
+import dotenv from 'dotenv';
+import routes from './routes/routes.js';
 import cors from 'cors';
+import { authMiddleware } from './middleware/auth.js';
 
-const uri = "mongodb+srv://rawanshubham:5Y0tex1Xb8xfiIKh@cluster0.hbfn6ar.mongodb.net/?retryWrites=true&w=majority";
+
+const uri = process.env.DB_URI;
 const app = express();
 const port = 8000;
 
@@ -16,12 +19,12 @@ mongoose.connect(uri, {
   console.log(e)
 });
 
-// Use CORS middleware
+// Use CORS middleware 
 app.use(cors());
 
 // Use routes
 app.use(express.json());
-app.use('/api', routes);
+app.use('/api', routes); // Add authMiddleware to protect routes
 
 // Start the server
 app.listen(port, () => {
