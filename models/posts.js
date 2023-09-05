@@ -16,6 +16,10 @@ const posts = new Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
+        },
+        done:{
+           type:Boolean,
+           default:false
         }
     },
     { timestamps: true }

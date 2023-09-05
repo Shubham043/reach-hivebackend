@@ -5,9 +5,7 @@ import * as blog from "../controller/blogcontroller.js";
 
 const router = express.Router();
 
-//routes for homepage
-//  router.route('/posts')
-//   .get(blog.getPosts)
+
 // Routes for posts
 router.route('/posts')
   .get(authMiddleware, blog.getPosts)
