@@ -26,6 +26,31 @@ export const insertPosts = async(req,res)=>{
         })
     }
 }
+export const update = async (req, res) => {
+    const { done } = req.body;
+    const id = req.params.id;
+  
+    try {
+      const post = await Post.findById(id);
+  
+      if (!post) {
+        return res.status(404).json({ message: "Post not found" });
+      }
+  
+      // Toggle the "done" property
+      post.done = done;
+      
+      // Save the updated post
+      await post.save();
+  
+      res.status(200).json({ message: "Post updated successfully", post });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Something went wrong" });
+    }
+  };
+  
+
 export const updatePostById = async(req,res)=>{
     const id = req.params.id;
     const {title, description} = req.body;
