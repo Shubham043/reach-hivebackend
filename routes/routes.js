@@ -13,7 +13,8 @@ router.route('/posts')
 
 router.route('/posts/:id')
   .delete(authMiddleware, blog.deletePostById)
-  .patch(authMiddleware, blog.updatePostById);
+  .put(authMiddleware, blog.updatePostById)
+  .patch(authMiddleware,blog.update)
 
 // Routes for users
 router.route('/users')
