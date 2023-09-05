@@ -3,9 +3,9 @@ import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 dotenv.config();
 import PostModel from "../models/posts.js";
-import UserModel from "../models/user.js";
+import User from "../models/user.js";
 import jwt from "jsonwebtoken";
-const User = mongoose.model("User", UserModel);
+// const User = mongoose.model("User", UserModel);
 const Post = mongoose.model("Post", PostModel);
 
 // GET request to get all users

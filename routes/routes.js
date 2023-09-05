@@ -19,15 +19,15 @@ router.route('/posts/:id')
 
 // Routes for users
 router.route('/users')
-  .get(authMiddleware, controller.getUsers)
+  .get( controller.getUsers)
   .post(controller.createUser);
 
 router.route("/users/logIn")
-  .post(authMiddleware, controller.logIn);
+  .post( controller.logIn);
 
 router.route('/users/:id')
   .get(authMiddleware, controller.getUserById)
   .patch(authMiddleware, controller.updateUserById)
-  .delete(authMiddleware, controller.deleteUserById);
+  .delete(controller.deleteUserById);
 
 export default router;
